@@ -16,7 +16,6 @@
  */
 package org.apache.rocketmq.tieredstore.file;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.annotations.VisibleForTesting;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -25,13 +24,13 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.apache.rocketmq.common.BoundaryType;
 import org.apache.rocketmq.logging.org.slf4j.Logger;
 import org.apache.rocketmq.logging.org.slf4j.LoggerFactory;
 import org.apache.rocketmq.tieredstore.common.AppendResult;
@@ -43,7 +42,6 @@ import org.apache.rocketmq.tieredstore.metadata.TieredMetadataStore;
 import org.apache.rocketmq.tieredstore.provider.FileSegmentAllocator;
 import org.apache.rocketmq.tieredstore.provider.TieredFileSegment;
 import org.apache.rocketmq.tieredstore.util.TieredStoreUtil;
-import org.apache.rocketmq.common.BoundaryType;
 
 public class TieredFlatFile {
 
@@ -220,11 +218,13 @@ public class TieredFlatFile {
         FileSegmentMetadata metadata = tieredMetadataStore.getFileSegment(
             this.filePath, fileSegment.getFileType(), fileSegment.getBaseOffset());
 
-        if (!Objects.equals(metadata, segmentMetadata)) {
-            this.tieredMetadataStore.updateFileSegment(segmentMetadata);
-            logger.debug("TieredFlatFile#UpdateSegmentMetadata, filePath: {}, content: {}",
-                segmentMetadata.getPath(), JSON.toJSONString(segmentMetadata));
-        }
+        this.tieredMetadataStore.updateFileSegment(segmentMetadata);
+
+//        if (!Objects.equals(metadata, segmentMetadata)) {
+//            this.tieredMetadataStore.updateFileSegment(segmentMetadata);
+//            logger.debug("TieredFlatFile#UpdateSegmentMetadata, filePath: {}, content: {}",
+//                segmentMetadata.getPath(), JSON.toJSONString(segmentMetadata));
+//        }
     }
 
     private void checkAndFixFileSize() {

@@ -31,7 +31,7 @@ import org.apache.rocketmq.tieredstore.exception.TieredStoreErrorCode;
 import org.apache.rocketmq.tieredstore.exception.TieredStoreException;
 import org.apache.rocketmq.tieredstore.file.TieredCommitLog;
 import org.apache.rocketmq.tieredstore.file.TieredConsumeQueue;
-import org.apache.rocketmq.tieredstore.file.TieredIndexFile;
+import org.apache.rocketmq.tieredstore.file.TieredIndexHeader;
 import org.apache.rocketmq.tieredstore.provider.stream.FileSegmentInputStream;
 import org.apache.rocketmq.tieredstore.provider.stream.FileSegmentInputStreamFactory;
 import org.apache.rocketmq.tieredstore.util.MessageBufferUtil;
@@ -198,8 +198,9 @@ public abstract class TieredFileSegment implements Comparable<TieredFileSegment>
             }
 
             if (fileType == FileSegmentType.INDEX) {
-                minTimestamp = byteBuf.getLong(TieredIndexFile.INDEX_FILE_HEADER_BEGIN_TIME_STAMP_POSITION);
-                maxTimestamp = byteBuf.getLong(TieredIndexFile.INDEX_FILE_HEADER_END_TIME_STAMP_POSITION);
+                minTimestamp = byteBuf.getLong(TieredIndexHeader.BEGIN_TIME_STAMP_INDEX);
+                maxTimestamp = byteBuf.getLong(TieredIndexHeader.END_TIME_STAMP_INDEX);
+
                 appendPosition += byteBuf.remaining();
                 // IndexFile is large and not change after compaction, no need deep copy
                 bufferList.add(byteBuf);

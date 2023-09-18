@@ -107,7 +107,7 @@ public class TieredMessageStoreConfig {
     private int tieredStoreGroupCommitSize = 32 * 1024 * 1024;
     // Cached message count larger than this value will suspend append. default is 2000
     private int tieredStoreMaxGroupCommitCount = 10000;
-    private int readAheadMinFactor  = 2;
+    private int readAheadMinFactor = 2;
     private int readAheadMaxFactor = 24;
     private int readAheadBatchSizeFactorThreshold = 8;
     private int readAheadMessageCountThreshold = 2048;

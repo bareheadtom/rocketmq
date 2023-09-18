@@ -97,7 +97,7 @@ public class TieredIndexFile {
             storeConfig.getStorePathRootDir(), INDEX_FILE_DIR_NAME, PRE_INDEX_FILE_NAME).toString();
         initFile();
         TieredStoreExecutor.commonScheduledExecutor.scheduleWithFixedDelay(
-            this::doScheduleTask, 10, 10, TimeUnit.SECONDS);
+            this::doScheduleTask, 10, 10, TimeUnit.MILLISECONDS);
     }
 
     protected void doScheduleTask() {

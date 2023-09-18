@@ -43,7 +43,7 @@ public class TieredFlatFileManager {
     private static final Logger logger = LoggerFactory.getLogger(TieredStoreUtil.TIERED_STORE_LOGGER_NAME);
 
     private static volatile TieredFlatFileManager instance;
-    private static volatile TieredIndexFile indexFile;
+    private static volatile TieredIndexService tieredIndexService;
 
     private final TieredMetadataStore metadataStore;
     private final TieredMessageStoreConfig storeConfig;
@@ -76,25 +76,25 @@ public class TieredFlatFileManager {
         return instance;
     }
 
-    public static TieredIndexFile getIndexFile(TieredMessageStoreConfig storeConfig) {
+    public static TieredIndexService getTieredIndexService(TieredMessageStoreConfig storeConfig) {
         if (storeConfig == null) {
-            return indexFile;
+            return tieredIndexService;
         }
 
-        if (indexFile == null) {
+        if (tieredIndexService == null) {
             synchronized (TieredFlatFileManager.class) {
-                if (indexFile == null) {
+                if (tieredIndexService == null) {
                     try {
                         String filePath = TieredStoreUtil.toPath(new MessageQueue(
                             TieredStoreUtil.RMQ_SYS_TIERED_STORE_INDEX_TOPIC, storeConfig.getBrokerName(), 0));
-                        indexFile = new TieredIndexFile(new TieredFileAllocator(storeConfig), filePath);
+                        tieredIndexService = new TieredIndexService(new TieredFileAllocator(storeConfig), filePath);
                     } catch (Exception e) {
                         logger.error("Construct FlatFileManager indexFile error", e);
                     }
                 }
             }
         }
-        return indexFile;
+        return tieredIndexService;
     }
 
     public void doCommit() {
@@ -122,8 +122,8 @@ public class TieredFlatFileManager {
         }
         TieredStoreExecutor.commitExecutor.schedule(() -> {
             try {
-                if (indexFile != null) {
-                    indexFile.commit(true);
+                if (tieredIndexService != null) {
+                    tieredIndexService.commit(true);
                 }
             } catch (Throwable e) {
                 logger.error("Commit indexFile periodically failed", e);
@@ -150,9 +150,9 @@ public class TieredFlatFileManager {
                 }
             });
         }
-        if (indexFile != null) {
-            indexFile.cleanExpiredFile(expiredTimeStamp);
-            indexFile.destroyExpiredFile();
+        if (tieredIndexService != null) {
+            tieredIndexService.cleanExpiredFile(expiredTimeStamp);
+            tieredIndexService.destroyExpiredFile();
         }
     }
 
@@ -246,7 +246,7 @@ public class TieredFlatFileManager {
 
     private static void cleanStaticReference() {
         instance = null;
-        indexFile = null;
+        tieredIndexService = null;
     }
 
     @Nullable
@@ -273,8 +273,8 @@ public class TieredFlatFileManager {
     }
 
     public void shutdown() {
-        if (indexFile != null) {
-            indexFile.commit(true);
+        if (tieredIndexService != null) {
+            tieredIndexService.commit(true);
         }
         for (CompositeFlatFile flatFile : deepCopyFlatFileToList()) {
             flatFile.shutdown();
@@ -282,8 +282,8 @@ public class TieredFlatFileManager {
     }
 
     public void destroy() {
-        if (indexFile != null) {
-            indexFile.destroy();
+        if (tieredIndexService != null) {
+            tieredIndexService.destroy();
         }
         ImmutableList<CompositeQueueFlatFile> flatFileList = deepCopyFlatFileToList();
         cleanup();

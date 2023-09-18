@@ -35,7 +35,7 @@ import org.junit.Test;
 
 public class TieredIndexFileTest {
 
-    private final String storePath = TieredStoreTestUtil.getRandomStorePath();
+    private final String storePath = "aaaa";
     private MessageQueue mq;
     private TieredMessageStoreConfig storeConfig;
 
@@ -90,4 +90,5 @@ public class TieredIndexFileTest {
 
         indexFile.destroy();
     }
+
 }

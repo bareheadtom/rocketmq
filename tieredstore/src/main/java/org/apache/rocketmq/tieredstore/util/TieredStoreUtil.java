@@ -155,7 +155,7 @@ public class TieredStoreUtil {
                         metadataStoreInstance = constructor.newInstance(storeConfig);
                     } catch (Exception e) {
                         logger.error("TieredMetadataStore#getInstance: " +
-                            "build metadata store failed, provider class: {}",
+                                "build metadata store failed, provider class: {}",
                             storeConfig.getTieredMetadataServiceProvider(), e);
                     }
                 }

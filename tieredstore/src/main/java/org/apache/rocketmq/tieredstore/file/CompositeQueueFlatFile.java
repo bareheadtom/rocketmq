@@ -31,13 +31,13 @@ public class CompositeQueueFlatFile extends CompositeFlatFile {
     private final MessageQueue messageQueue;
     private long topicSequenceNumber;
     private QueueMetadata queueMetadata;
-    private final TieredIndexFile indexFile;
+    private final TieredIndexService tieredIndexService;
 
     public CompositeQueueFlatFile(TieredFileAllocator fileQueueFactory, MessageQueue messageQueue) {
         super(fileQueueFactory, TieredStoreUtil.toPath(messageQueue));
         this.messageQueue = messageQueue;
         this.recoverQueueMetadata();
-        this.indexFile = TieredFlatFileManager.getIndexFile(storeConfig);
+        this.tieredIndexService = TieredFlatFileManager.getTieredIndexService(storeConfig);
     }
 
     @Override
@@ -86,23 +86,14 @@ public class CompositeQueueFlatFile extends CompositeFlatFile {
         }
 
         if (StringUtils.isNotBlank(request.getUniqKey())) {
-            AppendResult result = indexFile.append(messageQueue, (int) topicSequenceNumber,
+            AppendResult result = tieredIndexService.putKey(messageQueue, (int) topicSequenceNumber,
                 request.getUniqKey(), request.getCommitLogOffset(), request.getMsgSize(), request.getStoreTimestamp());
             if (result != AppendResult.SUCCESS) {
                 return result;
             }
         }
-
-        for (String key : request.getKeys().split(MessageConst.KEY_SEPARATOR)) {
-            if (StringUtils.isNotBlank(key)) {
-                AppendResult result = indexFile.append(messageQueue, (int) topicSequenceNumber,
-                    key, request.getCommitLogOffset(), request.getMsgSize(), request.getStoreTimestamp());
-                if (result != AppendResult.SUCCESS) {
-                    return result;
-                }
-            }
-        }
-        return AppendResult.SUCCESS;
+        return tieredIndexService.putBatchKeys(messageQueue, (int) topicSequenceNumber,
+            request.getKeys().split(MessageConst.KEY_SEPARATOR), request.getCommitLogOffset(), request.getMsgSize(), request.getStoreTimestamp());
     }
 
     public MessageQueue getMessageQueue() {
