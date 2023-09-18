@@ -55,7 +55,6 @@ public class TieredIndexService {
     ReentrantLock reentrantLock;
 
     public TieredIndexService(TieredFileAllocator fileQueueFactory, String filePath) throws IOException {
-        System.out.println("*****construct TieredIndexService");
         this.storeConfig = fileQueueFactory.getStoreConfig();
         this.maxHashSlotNum = storeConfig.getTieredStoreIndexFileMaxHashSlotNum();
         this.maxIndexNum = storeConfig.getTieredStoreIndexFileMaxIndexNum();
