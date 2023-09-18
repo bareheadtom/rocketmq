@@ -50,6 +50,8 @@ public class TieredIndexService {
 
     private CompactAndUploadService compactAndUploadService;
 
+    private IndexFileAccess curIndexFileAccess;
+
     ReentrantLock reentrantLock;
 
     public TieredIndexService(TieredFileAllocator fileQueueFactory, String filePath) throws IOException {
@@ -148,6 +150,7 @@ public class TieredIndexService {
                 if (needCreateWritingIndexFileAccess()) {
                     IndexFileAccess newIndexFileAccess = new IndexFileAccess("writing/" + timeStamp, maxHashSlotNum, maxIndexNum, timeStamp, null);
                     concurrentSkipListMap.put(timeStamp, newIndexFileAccess);
+                    curIndexFileAccess = newIndexFileAccess;
                     //init last compact position
                     if (compactIndexFileAccessKey == null) {
                         compactIndexFileAccessKey = concurrentSkipListMap.firstKey();
@@ -159,7 +162,7 @@ public class TieredIndexService {
                 reentrantLock.unlock();
             }
         }
-        return concurrentSkipListMap.lastEntry().getValue();
+        return curIndexFileAccess;
     }
 
     public CompletableFuture<List<IndexItem>> queryAsync(String topic, String key, long beginTime,

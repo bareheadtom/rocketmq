@@ -7,19 +7,21 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 public class StarterTest {
+    public static int slotNum = 500000;
+    public static int indexNum = 2000000;
     @Test
     public void testOriginIndexService() throws RunnerException {
         Options opt = new OptionsBuilder()
             .include(OriginIndexServiceBenchMark.class.getSimpleName())
-            //.include(NewIndexServiceBenchMark.class.getSimpleName())// 要导入的测试类
+            .include(NewIndexServiceBenchMark.class.getSimpleName())//
             .build();
-        new Runner(opt).run(); // 执行测试
+        new Runner(opt).run();
     }
 
-    @Test
-    public void testNewIndexService() throws RunnerException {
-        Options opt = new OptionsBuilder().include(NewIndexServiceBenchMark.class.getSimpleName()) // 要导入的测试类
-            .build();
-        new Runner(opt).run(); // 执行测试
-    }
+//    @Test
+//    public void testNewIndexService() throws RunnerException {
+//        Options opt = new OptionsBuilder().include(NewIndexServiceBenchMark.class.getSimpleName())
+//            .build();
+//        new Runner(opt).run();
+//    }
 }
